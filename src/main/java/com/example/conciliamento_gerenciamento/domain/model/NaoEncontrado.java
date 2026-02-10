@@ -5,6 +5,6 @@ import java.util.UUID;
 public record NaoEncontrado(
         UUID idTransacaoInterna,
         String idTransacaoBancaria,
-        String Motivo
+        String motivo
 ) implements ResultadoConciliacao {
 }

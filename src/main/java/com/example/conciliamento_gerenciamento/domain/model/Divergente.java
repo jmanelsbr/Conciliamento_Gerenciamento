@@ -5,6 +5,7 @@ import java.util.UUID;
 
 public record Divergente(
         UUID idTransacaoInterna,
+        String idTransacaoBancaria,
         BigDecimal valorEsperado,
         BigDecimal valorRecebido,
         BigDecimal valorDiferenca
