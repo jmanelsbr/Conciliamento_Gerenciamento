@@ -1,5 +1,7 @@
 package com.example.conciliamento_gerenciamento.domain.model;
 
+import com.example.conciliamento_gerenciamento.domain.exception.ValidacaoDominioException;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -19,6 +21,12 @@ public record TransacaoInterna(
                 this.dataTransacao(),
                 novoStatus
         );
+    }
+
+    public TransacaoInterna{
+       if (valorPrevisto == null || valorPrevisto.compareTo(BigDecimal.ZERO) <= 0){
+           throw new ValidacaoDominioException("O valor previsto deve ser positivo e não nulo.");
+       }
     }
 
 }

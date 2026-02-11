@@ -1,5 +1,6 @@
 package com.example.conciliamento_gerenciamento.domain.service;
 
+import com.example.conciliamento_gerenciamento.domain.exception.ValidacaoDominioException;
 import com.example.conciliamento_gerenciamento.domain.model.StatusConciliacao;
 import com.example.conciliamento_gerenciamento.domain.model.TransacaoBancaria;
 import com.example.conciliamento_gerenciamento.domain.model.TransacaoInterna;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -60,4 +62,52 @@ class ConciliacaoServiceTest {
         assertEquals(StatusConciliacao.CONCILIADO, transacaoSalva.status());
         assertEquals(idInterno, transacaoSalva.idTransacaoInterna());
     }
+
+    @Test
+    void processarConciliacao_ComValoresDiferentes_DeveSalvarComoDivergente() {
+
+        var idInterno = UUID.randomUUID();
+        var tInterna = new TransacaoInterna(
+                idInterno, "Venda",
+                new BigDecimal("100.00"),
+                LocalDateTime.now(),
+                StatusConciliacao.PENDENTE
+        );
+
+        var tBancaria = new TransacaoBancaria(
+                UUID.randomUUID().toString(),
+                "Depósito Identificado",
+                new BigDecimal("100.50"),
+                LocalDateTime.now()
+        );
+
+        when(repository.buscaPorStatus(StatusConciliacao.PENDENTE))
+                .thenReturn(Stream.of(tInterna));
+
+        service.processarConciliacao(tBancaria);
+
+        ArgumentCaptor<TransacaoInterna> captor = ArgumentCaptor.forClass(TransacaoInterna.class);
+        verify(repository, times(1)).salvar(captor.capture());
+
+        TransacaoInterna transacaoSalva = captor.getValue();
+
+        assertEquals(StatusConciliacao.DIVERGENTE, transacaoSalva.status());
+        assertEquals(idInterno, transacaoSalva.idTransacaoInterna());
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoTraansacaoBancariaForNula() {
+
+
+        ValidacaoDominioException e = assertThrows(
+                ValidacaoDominioException.class,
+                () -> service.processarConciliacao(null)
+        );
+
+        assertThat(e.getMessage()).isEqualTo("A transação bancária é obrigatória para o processamento.");
+        verifyNoInteractions(repository);
+
+    }
+
+
 }
