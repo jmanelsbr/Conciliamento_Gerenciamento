@@ -5,10 +5,10 @@ import com.example.conciliamento_gerenciamento.entrypoint.rest.dto.TransacaoInte
 import com.example.conciliamento_gerenciamento.entrypoint.rest.dto.TransacaoInternaResponse;
 import com.example.conciliamento_gerenciamento.entrypoint.rest.mapper.TransacaoInternaMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -32,6 +32,15 @@ public class TransacaoInternaController {
         transacaoInternaRepository.salvar(requestToEntity);
         var entityToResponse = transacaoInternaMapper.toResponse(requestToEntity);
         return ResponseEntity.status(CREATED).body(entityToResponse);
+    }
+
+    @GetMapping("/{id}")
+    ResponseEntity<TransacaoInternaResponse> get (@PathVariable UUID id){
+        return transacaoInternaRepository.buscaPorId(id)
+                .map(transacaoInternaMapper::toResponse)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+
     }
 
 }
