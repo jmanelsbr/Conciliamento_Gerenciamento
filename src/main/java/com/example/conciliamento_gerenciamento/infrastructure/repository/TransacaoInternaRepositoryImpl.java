@@ -33,4 +33,12 @@ public class TransacaoInternaRepositoryImpl implements TransacaoInternaRepositor
     public TransacaoInterna salvar(TransacaoInterna transacao) {
         return dao.save(new TransacaoInternaEntity(transacao)).toDomain();
     }
+
+    @Override
+    public void deletarPorId(UUID id) {
+        dao.deleteById(id);
+
+    }
+
+
 }

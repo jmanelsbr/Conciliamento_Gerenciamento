@@ -1,7 +1,6 @@
 package com.example.conciliamento_gerenciamento.domain.repository;
 
 import com.example.conciliamento_gerenciamento.domain.model.StatusConciliacao;
-import com.example.conciliamento_gerenciamento.domain.model.TransacaoBancaria;
 import com.example.conciliamento_gerenciamento.domain.model.TransacaoInterna;
 
 import java.util.Optional;
@@ -16,4 +15,5 @@ public interface TransacaoInternaRepository {
 
     TransacaoInterna salvar(TransacaoInterna transacao);
 
+    void deletarPorId(UUID id);
 }
